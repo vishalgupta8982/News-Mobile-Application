@@ -54,7 +54,7 @@ export default function NewsDetails({ navigation }) {
 	);
 }
 
-const getStyles = (colors) =>
+const getStyles = (colors:any) =>
 	StyleSheet.create({
 		mainCont: {
 			flex: 1,
@@ -73,6 +73,7 @@ const getStyles = (colors) =>
 		thumbNail: {
 			height: height / 3,
 			width: width,
+			objectFit:'cover'
 		},
 		author: {
 			fontSize: 14,
