@@ -14,12 +14,14 @@ import { colors } from '../../config/Theme';
 import { useDispatch, useSelector } from 'react-redux';
 import { setNews } from '../../redux/slices/NewsSlice';
 import NetInfo from '@react-native-community/netinfo';
+
 const NewsFeed = ({ navigation }) => {
 	const [loading, setLoading] = useState(false);
 	const [refreshing, setRefreshing] = useState(false);
 	const dispatch = useDispatch();
 	const news = useSelector((state) => state.news.news);
 	const styles = getStyles(colors);
+
 	const getNews = async () => {
 		try {
 			const response = await fetchNews();
@@ -32,6 +34,7 @@ const NewsFeed = ({ navigation }) => {
 			setLoading(false);
 		}
 	};
+
 	const handleRefresh = async () => {
 		setRefreshing(true);
 		await getNews();
@@ -50,17 +53,17 @@ const NewsFeed = ({ navigation }) => {
 	}, []);
 
 	const renderArticle = ({ item }) =>
-		item.title != '[Removed]' && (
+		item.title !== '[Removed]' && (
 			<TouchableOpacity
 				onPress={() => navigation.navigate('NewsDetail', { data: item })}
 				style={styles.articleContainer}
 			>
 				<Image source={{ uri: item.urlToImage }} style={styles.thumbnail} />
 				<View style={styles.textContainer}>
-					<Text numberOfLines={1} ellipsizeMode="tail" style={styles.title}>
+					<Text numberOfLines={1} style={styles.title}>
 						{item.title}
 					</Text>
-					<Text numberOfLines={3} ellipsizeMode="tail" style={styles.summary}>
+					<Text numberOfLines={2} style={styles.summary}>
 						{item.description}
 					</Text>
 				</View>
@@ -70,11 +73,20 @@ const NewsFeed = ({ navigation }) => {
 	return (
 		<View style={styles.mainContainer}>
 			{loading && (
-				<ActivityIndicator size={34} color={colors.RED} style={styles.loader} />
+				<ActivityIndicator
+					size="large"
+					color={colors.BLUE}
+					style={styles.loader}
+				/>
 			)}
 			{news && (
 				<View style={styles.container}>
-					<Text style={styles.head}>Top news</Text>
+					<View style={styles.header}>
+						<Text style={styles.head}>Top News</Text>
+						<TouchableOpacity onPress={() => navigation.navigate('Login')}>
+							<Text style={styles.login}>Login</Text>
+						</TouchableOpacity>
+					</View>
 					<FlatList
 						data={news}
 						keyExtractor={(item) => item.publishedAt}
@@ -83,18 +95,9 @@ const NewsFeed = ({ navigation }) => {
 							<RefreshControl
 								refreshing={refreshing}
 								onRefresh={handleRefresh}
+								tintColor={colors.BLUE}
 							/>
 						}
-						initialNumToRender={5}
-						maxToRenderPerBatch={10}
-						updateCellsBatchingPeriod={50}
-						windowSize={5}
-						removeClippedSubviews={true}
-						getItemLayout={(data, index) => ({
-							length: 120,
-							offset: 120 * index,
-							index,
-						})}
 					/>
 				</View>
 			)}
@@ -102,39 +105,50 @@ const NewsFeed = ({ navigation }) => {
 	);
 };
 
-const getStyles = (colors: any) =>
+const getStyles = (colors) =>
 	StyleSheet.create({
 		mainContainer: {
 			flex: 1,
 			backgroundColor: colors.BACKGROUND,
-			justifyContent: 'center',
 		},
 		container: { flex: 1 },
+		header: {
+			paddingVertical: 15,
+			paddingHorizontal: 20,
+			backgroundColor: colors.WHITE,
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			alignItems: 'center',
+			marginBottom: 4,
+		},
 		head: {
-			fontSize: 24,
+			fontSize: 20,
 			fontWeight: '500',
 			color: colors.TEXT,
-			padding: 10,
-			backgroundColor: colors.WHITE,
+		},
+		login: {
+			color: colors.BLUE,
+			fontSize: 16,
+			fontWeight: '500',
 		},
 		articleContainer: {
 			flexDirection: 'row',
-			marginVertical: 3,
+			marginVertical: 4,
+			marginHorizontal: 10,
 			backgroundColor: colors.WHITE,
-			borderRadius: 8,
+			borderRadius: 10,
 			overflow: 'hidden',
-			elevation: 3,
 			shadowColor: '#000',
 			shadowOpacity: 0.1,
-			shadowRadius: 5,
+			shadowRadius: 4,
 			shadowOffset: { width: 0, height: 2 },
-			paddingHorizontal: 10,
-			alignItems: 'center',
+			elevation: 3,
 		},
 		thumbnail: {
-			width: 80,
-			height: 80,
-			borderRadius: 20,
+			width: 100,
+			height: 100,
+			borderTopLeftRadius: 10,
+			borderBottomLeftRadius: 10,
 			backgroundColor: colors.BACKGROUND,
 		},
 		textContainer: {
@@ -149,13 +163,15 @@ const getStyles = (colors: any) =>
 			color: colors.TEXT,
 		},
 		summary: {
-			fontSize: 12,
+			fontSize: 14,
 			color: colors.LIGHT_TEXT,
 		},
 		loader: {
-			position: 'absolute',
-			zIndex: 1,
-			left: '46%',
+			marginTop: 20,
+			position:'absolute',
+			left:'45%',
+			zIndex:1,
+			top:"45%"
 		},
 	});
 
